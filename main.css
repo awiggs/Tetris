@@ -1,0 +1,36 @@
+body {
+  background: #202028;
+  color: #fff;
+  font-family: sans-serif;
+  font-size: 2em;
+  text-align: center;
+}
+
+#wrapper {
+  display: inline-block;
+}
+
+canvas {
+  border: solid .2em #fff;
+  height: 90vh;
+}
+
+#score-wrapper {
+  margin: 2px;
+}
+
+#score-title,
+#score {
+  display: inline;
+}
+
+#score {
+  color: yellow;
+}
+
+#press-to-play {
+  top: 25%;
+  font-size: 0.75em;
+  position: absolute;
+  width: 56vh;
+}
