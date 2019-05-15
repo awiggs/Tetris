@@ -323,8 +323,8 @@ document.addEventListener('keydown', event => {
     playerDrop();
   }
 
-  // Up or space for drop?
-  else if (event.keyCode === 38) {
+  // Space for hard drop
+  else if (event.keyCode === 32) {
     hardDrop();
   }
 
