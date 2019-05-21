@@ -38,16 +38,16 @@ function arenaSweep() {
     console.log(rowCount);
     switch(rowCount) {
       case 1:
-        player.score += 40;   // Single
+        player.score += (40 * (level + 1));   // Single
         break;
       case 2:
-        player.score += 100;  // Double
+        player.score += (100 * (level + 1));  // Double
         break;
       case 3:
-        player.score += 300;  // Triple
+        player.score += (300 * (level + 1));  // Triple
         break;
       default:
-        player.score += 1200; // Tetris
+        player.score += (1200 * (level + 1)); // Tetris
         break;
     }
     rowCount = 0;
@@ -304,7 +304,7 @@ function menu() {
     } else if (event.keyCode === 39) {
       // Right arrow
       if (active === 1) {
-        let s = document.querySelector('#start-level').innerHTML;
+        let s = parseInt(document.querySelector('#start-level').innerHTML);
         if (s < 29) {
           s++;
           level = s;
@@ -314,7 +314,7 @@ function menu() {
     } else if (event.keyCode === 37) {
       // Left arrow
       if (active === 1) {
-        let s = document.querySelector('#start-level').innerHTML;
+        let s = parseInt(document.querySelector('#start-level').innerHTML);
         if (s > 0) {
           s--;
           level = s;
@@ -334,7 +334,7 @@ function menu() {
           document.querySelector('#menu').classList.add('hidden');
 
           // Reset stats
-          level = document.querySelector('#start-level').innerHTML;
+          level = parseInt(document.querySelector('#start-level').innerHTML);
           changeLevel(level);
           updateSpeed(level);
 
