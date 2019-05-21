@@ -54,6 +54,10 @@ function arenaSweep() {
   }
 }
 
+function changeLevel(newLevel) {
+  document.querySelector('#level').innerText = newLevel;
+}
+
 // Checks for piece collision
 function collide(arena, player) {
   // m = Matrix, o = Offset
@@ -130,14 +134,23 @@ function createPiece(type) {
 
 function draw() {
   // Draw canvas
-  context.fillStyle = '#323C4D';
-  context.fillRect(0, 0, canvas.width, canvas.height);
+  drawCanvas();
 
   // Draw arena
   drawMatrix(arena, {x: 0, y: 0});
 
   // Draw piece
   drawMatrix(player.matrix, player.pos);
+}
+
+function drawCanvas() {
+  context.fillStyle = '#323C4D';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawCanvasBlank() {
+  context.fillStyle = '#202028';
+  context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 function drawMatrix(matrix, offset) {
@@ -196,7 +209,7 @@ function playerDrop() {
 
     // Check if it was a hard drop
     if (dropInterval === 1) {
-      dropInterval = 1000;
+      updateSpeed(level);
     }
   }
 
@@ -213,12 +226,7 @@ function playerReset() {
 
   // Game over, filled arena
   if (collide(arena, player)) {
-    arena.forEach(row => row.fill(0));
-    linesCleared = 0;
-    player.score = 0;
-    level = 0;
-    updateScore();
-    startGame();
+    restartGame();
   }
 }
 
@@ -250,6 +258,115 @@ function playerRotate(dir) {
   }
 }
 
+function menu() {
+  // Start menu with option 1 focused
+  document.getElementById('option-1').focus();
+
+  // Navigate list
+  document.addEventListener('keydown', event => {
+    let active = document.activeElement.tabIndex;
+    if (event.keyCode === 40) {
+      // Down arrow
+      switch(active) {
+        case 1:
+          document.activeElement.blur();
+          document.getElementById('option-2').focus();
+          break;
+        case 2:
+          document.activeElement.blur();
+          document.getElementById('option-3').focus();
+          break;
+        case 3:
+          document.activeElement.blur();
+          document.getElementById('option-1').focus();
+          break;
+        default:
+          break;
+      }
+    } else if (event.keyCode === 38) {
+      // Up arrow
+      switch(active) {
+        case 1:
+          document.activeElement.blur();
+          document.getElementById('option-3').focus();
+          break;
+        case 2:
+          document.activeElement.blur();
+          document.getElementById('option-1').focus();
+          break;
+        case 3:
+          document.activeElement.blur();
+          document.getElementById('option-2').focus();
+          break;
+        default:
+          break;
+      }
+    } else if (event.keyCode === 39) {
+      // Right arrow
+      if (active === 1) {
+        let s = document.querySelector('#start-level').innerHTML;
+        if (s < 29) {
+          s++;
+          level = s;
+          document.querySelector('#start-level').innerHTML = s;
+        }
+      }
+    } else if (event.keyCode === 37) {
+      // Left arrow
+      if (active === 1) {
+        let s = document.querySelector('#start-level').innerHTML;
+        if (s > 0) {
+          s--;
+          level = s;
+          document.querySelector('#start-level').innerHTML = s;
+        }
+      }
+
+    } else if (event.keyCode === 13) {
+      // Enter key
+      switch(active) {
+        case 1:
+          break;
+        case 2:
+          // Reset field
+          isPaused = false;
+          drawCanvas();
+          document.querySelector('#menu').classList.add('hidden');
+
+          // Reset stats
+          level = document.querySelector('#start-level').innerHTML;
+          changeLevel(level);
+          updateSpeed(level);
+
+          // Start game
+          update();
+          break;
+        case 3:
+          break;
+      }
+    }
+  });
+}
+
+function restartGame() {
+  // Stop flow of game
+  isPaused = true;
+
+  // Reset canvas
+  drawCanvasBlank();
+  arena.forEach(row => row.fill(0));
+
+  // Show menu + reset
+  document.querySelector('#menu').classList.remove('hidden');
+  document.querySelector('#option-2').focus();
+
+  // Reset stats
+  linesCleared = 0;
+  player.score = 0;
+  level = 0;
+  updateScore();
+}
+
 function rotate(matrix, dir) {
   for (let y = 0; y < matrix.length; ++y) {
     for (let x = 0; x < y; ++x) {
@@ -275,7 +392,8 @@ function startGame() {
   document.getElementById('press-to-play').innerText = 'Press any key to continue...';
   document.onkeypress = () => {
     document.getElementById('press-to-play').innerText = '';
-    update();
+    // update();
+    menu();
   }
 }
 
@@ -303,7 +421,7 @@ function update(time = 0) {
   }
 }
 
-let isPaused = false;
+let isPaused = true;
 function pause() {
   isPaused = true;
   document.getElementById('press-to-play').innerText = 'Paused!\nPress any key to continue...';
@@ -319,14 +437,18 @@ function updateLevel() {
   if (l > level) {
     // Level up!
     level++;
-    document.getElementById('level').innerText = level;
-    dropInterval = speeds[level];
+    changeLevel(level);
+    updateSpeed(level);
   }
 }
 
 function updateScore() {
   document.getElementById('lines').innerText = linesCleared;
   document.getElementById('score').innerText = player.score;
+}
+
+function updateSpeed(newLevel) {
+  dropInterval = speeds[newLevel];
 }
 
 const colors = [
@@ -368,8 +490,8 @@ document.addEventListener('keydown', event => {
     playerDrop();
   }
 
-  // Up for hard drop
-  else if (event.keyCode === 38) {
+  // Space for hard drop
+  else if (event.keyCode === 32) {
     hardDrop();
   }
 
@@ -378,14 +500,13 @@ document.addEventListener('keydown', event => {
     playerRotate(-1);
   }
 
-  // X for CW
-  else if (event.keyCode === 88) {
+  // X or Up for CW
+  else if (event.keyCode === 88 || event.keyCode === 38) {
     playerRotate(1);
   }
 
-  // Esc for pause?
+  // Esc or P for pause
   else if (event.keyCode === 27) {
-    console.log('pause');
     pause();
   }
 });
@@ -393,4 +514,5 @@ document.addEventListener('keydown', event => {
 // Start Tetris
 playerReset();
 updateScore();
-startGame();
+menu();
+// startGame();

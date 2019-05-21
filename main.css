@@ -4,6 +4,40 @@ body {
   font-family: sans-serif;
   font-size: 2em;
   text-align: center;
+  font-family: monospace;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#menu {
+  display: inline-block;
+  position: absolute;
+  height: 90vh;
+  width: 46.5vh;
+  margin: inherit;
+}
+
+#menu-options {
+  display: block;
+  list-style: none;
+  padding: 0;
+  margin-top: 25%;
+}
+
+.m-option {
+  font-family: monospace;
+  padding: 5px;
+}
+
+.m-option:focus {
+  color: red;
+  outline: none;
+}
+
+#start-level {
+  display: inline;
 }
 
 #wrapper {

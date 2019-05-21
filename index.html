@@ -3,6 +3,7 @@
     <title>TetrisJS</title>
     <link rel="stylesheet" type="text/css" href="main.css">
   </head>
+  <!-- TODO: ADD CONTROLS -->
   <body>
     <div id="wrapper">
       <div id="score-wrapper">
@@ -15,6 +16,13 @@
         <p id="level-label">Level:</p>
         <div id="level"></div>
       </div>
+      <div id="menu" width="200" height="400">
+          <ul id="menu-options">
+            <li id="option-1" class="m-option" tabindex="1">LEVEL: <p id="start-level">0</p></li>
+            <li id="option-2" class="m-option" tabindex="2">START GAME</li>
+            <li id="option-3" class="m-option" tabindex="3">SETTINGS</li>
+          </ul>
+        </div>
       <div id="press-to-play"></div>
       <canvas id="tetris" width="200" height="400"></canvas>
       <script src="tetris.js"></script>
