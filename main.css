@@ -36,7 +36,8 @@ body {
   outline: none;
 }
 
-#start-level {
+#start-level,
+.arrow {
   display: inline;
 }
 
@@ -86,4 +87,10 @@ body {
   font-size: 0.75em;
   position: absolute;
   width: 46.5vh;
+}
+
+.control {
+  text-align: left;
+  margin-block-start: 0.5em;
+  margin-block-end: 0.5em;
 }
