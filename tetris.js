@@ -4,6 +4,12 @@ const context = canvas.getContext('2d');
 
 context.scale(20, 20);
 
+// Globals
+// TODO add starting levels and adjust speed math
+const speeds = [800, 717, 633, 550, 467, 383, 300, 217, 133, 100, 83, 83, 83, 67, 67, 67, 50, 50, 50, 33, 33, 33, 33, 33, 33, 33, 33, 33, 17]; // NES Tetris
+var level = 0;
+var linesCleared = 0;
+
 // Line clears + score
 function arenaSweep() {
   let rowCount = 0;
@@ -19,6 +25,8 @@ function arenaSweep() {
 
     const row = arena.splice(y, 1)[0].fill(0); // Remove row
     arena.unshift(row); // Add empty row on top of arena
+    linesCleared++;
+    updateLevel();
     ++y;
 
     // Get total number of rows cleared
@@ -122,7 +130,7 @@ function createPiece(type) {
 
 function draw() {
   // Draw canvas
-  context.fillStyle = '#000';
+  context.fillStyle = '#323C4D';
   context.fillRect(0, 0, canvas.width, canvas.height);
 
   // Draw arena
@@ -137,10 +145,23 @@ function drawMatrix(matrix, offset) {
     row.forEach((val, x) => {
       // 0 = nothing, 1 = block
       if (val !== 0) {
+        // Color pieces
         context.fillStyle = colors[val];
         context.fillRect(x + offset.x,
                          y + offset.y, 
                          1, 1);
+
+        // Draw lines on pieces
+        context.strokeStyle = '#000';
+        context.lineWidth = 0.04;
+        context.strokeRect(x + offset.x, y + offset.y, 1, 1);
+      } else {
+        // Draw lines on arena
+        if (matrix === arena) {
+          context.strokeStyle = '#000';
+          context.lineWidth = 0.03
+          context.strokeRect(x, y, 1, 1);
+        }
       }
     });
   });
@@ -193,8 +214,11 @@ function playerReset() {
   // Game over, filled arena
   if (collide(arena, player)) {
     arena.forEach(row => row.fill(0));
+    linesCleared = 0;
     player.score = 0;
+    level = 0;
     updateScore();
+    startGame();
   }
 }
 
@@ -247,6 +271,7 @@ function rotate(matrix, dir) {
 }
 
 function startGame() {
+  document.getElementById('level').innerText = 0;
   document.getElementById('press-to-play').innerText = 'Press any key to continue...';
   document.onkeypress = () => {
     document.getElementById('press-to-play').innerText = '';
@@ -257,6 +282,7 @@ function startGame() {
 // Handle piece dropping
 let dropCounter = 0;
 let dropInterval = 1000;
+let updateID = null;
 
 // Handle game timing
 let lastTime = 0;
@@ -269,24 +295,40 @@ function update(time = 0) {
   if (dropCounter > dropInterval) {
     playerDrop();
   }
-
-  draw();
-  requestAnimationFrame(update);
+  if (!isPaused) {
+    draw();
+    updateID = requestAnimationFrame(update);
+  } else {
+    cancelAnimationFrame(updateID);
+  }
 }
 
+let isPaused = false;
 function pause() {
-  document.getElementById('press-to-play').innerText = 'Press any key to continue...';
-  // document.onkeypress = () => {
-  //   document.getElementById('press-to-play').innerText = '';
-  //   update();
-  // }
+  isPaused = true;
+  document.getElementById('press-to-play').innerText = 'Paused!\nPress any key to continue...';
+  document.onkeypress = () => {
+    isPaused = false;
+    document.getElementById('press-to-play').innerText = '';
+    update();
+  }
+}
+
+function updateLevel() {
+  let l = Math.floor(linesCleared / 10);
+  if (l > level) {
+    // Level up!
+    level++;
+    document.getElementById('level').innerText = level;
+    dropInterval = speeds[level];
+  }
 }
 
 function updateScore() {
+  document.getElementById('lines').innerText = linesCleared;
   document.getElementById('score').innerText = player.score;
 }
 
-// TODO: Change colors to better hex colors
 const colors = [
   null,       // 0
   '#A000F0',  // 1
@@ -298,7 +340,7 @@ const colors = [
   '#F00000'   // 7
 ]
 
-const arena = createMatrix(12, 20);
+const arena = createMatrix(10, 20);
 
 const player = {
   pos: {x: 0, y: 0},
@@ -308,6 +350,9 @@ const player = {
 
 // Key presses
 document.addEventListener('keydown', event => {
+  // Check if paused
+  if (isPaused) return;
+
   // Left
   if (event.keyCode === 37) {
     playerMove(-1);
@@ -318,28 +363,28 @@ document.addEventListener('keydown', event => {
     playerMove(1);
   }
 
-  // Down
+  // Down for soft drop
   else if (event.keyCode === 40) {
     playerDrop();
   }
 
-  // Space for hard drop
-  else if (event.keyCode === 32) {
+  // Up for hard drop
+  else if (event.keyCode === 38) {
     hardDrop();
   }
 
-  // Q
-  else if (event.keyCode === 81) {
+  // Z for CCW
+  else if (event.keyCode === 90) {
     playerRotate(-1);
   }
 
-  // W
-  else if (event.keyCode === 87) {
+  // X for CW
+  else if (event.keyCode === 88) {
     playerRotate(1);
   }
 
-  // P for pause?
-  else if (event.keyCode === 80) {
+  // Esc for pause?
+  else if (event.keyCode === 27) {
     console.log('pause');
     pause();
   }

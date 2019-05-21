@@ -17,14 +17,22 @@ canvas {
 
 #score-wrapper {
   margin: 2px;
+  float: right;
+  text-align: left;
 }
 
 #score-title,
-#score {
+#score,
+#lines-cleared,
+#lines,
+#level-label,
+#level {
   display: inline;
 }
 
-#score {
+#score,
+#lines,
+#level {
   color: yellow;
 }
 
@@ -32,5 +40,5 @@ canvas {
   top: 25%;
   font-size: 0.75em;
   position: absolute;
-  width: 56vh;
+  width: 46.5vh;
 }
