@@ -6,16 +6,6 @@
   <!-- TODO: ADD CONTROLS -->
   <body>
     <div id="wrapper">
-      <div id="score-wrapper">
-        <p id="score-title">Score:</p>
-        <div id="score"></div>
-        <br />
-        <p id="lines-cleared">Lines:</p>
-        <div id="lines"></div>
-        <br />
-        <p id="level-label">Level:</p>
-        <div id="level"></div>
-      </div>
       <div id="menu" width="200" height="400">
           <ul id="menu-options">
             <li id="option-1" class="m-option" tabindex="1">LEVEL: <p id="start-level">0</p></li>
@@ -24,7 +14,24 @@
           </ul>
         </div>
       <div id="press-to-play"></div>
-      <canvas id="tetris" width="200" height="400"></canvas>
+      <!-- <canvas id="next" width="150" height="150"></canvas> -->
+      <div id="canvas-wrapper">
+        <canvas id="tetris" width="200" height="400"></canvas>
+      </div>
+      <div id="score-wrapper">
+          <p id="score-title">Score:</p>
+          <div id="score"></div>
+          <br />
+          <p id="lines-cleared">Lines:</p>
+          <div id="lines"></div>
+          <br />
+          <p id="level-label">Level:</p>
+          <div id="level"></div>
+        </div>
+      <div id="hold-wrapper">
+        <p>Hold</p>
+        <canvas id="hold" width="150" height="150"></canvas>
+      </div>
       <script src="tetris.js"></script>
     </div>  
   </body>

@@ -1,14 +1,20 @@
 // Create canvas
 const canvas = document.getElementById('tetris');
 const context = canvas.getContext('2d');
+const hold_canvas = document.getElementById("hold");
+const hold_context = hold_canvas.getContext("2d");
 
 context.scale(20, 20);
+hold_context.scale(40, 40);
 
 // Globals
 // TODO add starting levels and adjust speed math
 const speeds = [800, 717, 633, 550, 467, 383, 300, 217, 133, 100, 83, 83, 83, 67, 67, 67, 50, 50, 50, 33, 33, 33, 33, 33, 33, 33, 33, 33, 17]; // NES Tetris
+const arena = createMatrix(10, 20);
 var level = 0;
 var linesCleared = 0;
+const pieces = 'ILJOTSZ';
+var hold = [];
 
 // Line clears + score
 function arenaSweep() {
@@ -136,11 +142,16 @@ function draw() {
   // Draw canvas
   drawCanvas();
 
+  // Draw hold
+  hold_context.fillStyle = '#323C4D';
+  hold_context.fillRect(0, 0, hold_canvas.width, hold_canvas.height);
+
   // Draw arena
   drawMatrix(arena, {x: 0, y: 0});
 
   // Draw piece
   drawMatrix(player.matrix, player.pos);
+  drawHold(hold, {x: 0, y: 0});
 }
 
 function drawCanvas() {
@@ -174,6 +185,33 @@ function drawMatrix(matrix, offset) {
           context.strokeStyle = '#000';
           context.lineWidth = 0.03
           context.strokeRect(x, y, 1, 1);
+        }
+      }
+    });
+  });
+}
+
+function drawHold(matrix, offset) {
+  matrix.forEach((row, y) => {
+    row.forEach((val, x) => {
+      // 0 = nothing, 1 = block
+      if (val !== 0) {
+        // Color pieces
+        hold_context.fillStyle = colors[val];
+        hold_context.fillRect(x + offset.x,
+                         y + offset.y, 
+                         1, 1);
+
+        // Draw lines on pieces
+        hold_context.strokeStyle = '#000';
+        hold_context.lineWidth = 0.04;
+        hold_context.strokeRect(x + offset.x, y + offset.y, 1, 1);
+      } else {
+        // Draw lines on arena
+        if (matrix === arena) {
+          hold_context.strokeStyle = '#000';
+          hold_context.lineWidth = 0.03
+          hold_context.strokeRect(x, y, 1, 1);
         }
       }
     });
@@ -219,7 +257,6 @@ function playerDrop() {
 
 function playerReset() {
   // Create a random new piece
-  const pieces = 'ILJOTSZ';
   player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
   player.pos.y = 0;
   player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
@@ -462,8 +499,6 @@ const colors = [
   '#F00000'   // 7
 ]
 
-const arena = createMatrix(10, 20);
-
 const player = {
   pos: {x: 0, y: 0},
   matrix: null,
@@ -492,7 +527,11 @@ document.addEventListener('keydown', event => {
 
   // Space for hard drop
   else if (event.keyCode === 32) {
-    hardDrop();
+    while (!collide(arena, player)) {
+      ++player.pos.y
+    }
+    --player.pos.y
+    playerDrop();
   }
 
   // Z for CCW
@@ -503,6 +542,21 @@ document.addEventListener('keydown', event => {
   // X or Up for CW
   else if (event.keyCode === 88 || event.keyCode === 38) {
     playerRotate(1);
+  }
+
+  else if (event.keyCode === 67) {
+    // Check for first hold
+    if (hold.length === 0) {
+      hold = player.matrix;
+      player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
+      draw();
+    } else {
+      // Regular hold
+      [player.matrix, hold] = [hold, player.matrix];
+      if (collide(arena, player)) {
+        [player.matrix, hold] = [hold, player.matrix];
+      }
+    }
   }
 
   // Esc or P for pause
