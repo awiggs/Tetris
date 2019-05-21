@@ -392,6 +392,7 @@ function restartGame() {
   // Reset canvas
   drawCanvasBlank();
   arena.forEach(row => row.fill(0));
+  hold = [];
 
   // Show menu + reset
   document.querySelector('#menu').classList.remove('hidden');
@@ -554,7 +555,8 @@ document.addEventListener('keydown', event => {
       // Regular hold
       [player.matrix, hold] = [hold, player.matrix];
       if (collide(arena, player)) {
-        [player.matrix, hold] = [hold, player.matrix];
+        // ! DO I NEED THIS?
+        // [player.matrix, hold] = [hold, player.matrix];
       }
     }
   }
