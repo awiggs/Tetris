@@ -546,6 +546,10 @@ document.addEventListener('keydown', event => {
   }
 
   else if (event.keyCode === 67) {
+    // Reset player position to top
+    player.pos.x = 4;
+    player.pos.y = 0;
+
     // Check for first hold
     if (hold.length === 0) {
       hold = player.matrix;
@@ -556,7 +560,7 @@ document.addEventListener('keydown', event => {
       [player.matrix, hold] = [hold, player.matrix];
       if (collide(arena, player)) {
         // ! DO I NEED THIS?
-        // [player.matrix, hold] = [hold, player.matrix];
+        [player.matrix, hold] = [hold, player.matrix];
       }
     }
   }
