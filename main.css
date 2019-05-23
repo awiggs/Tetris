@@ -16,9 +16,17 @@ body {
 }
 
 #menu {
+  top: 20%;
   display: inline-block;
   position: absolute;
-  height: 90vh;
+  width: 46.5vh;
+  margin: inherit;
+}
+
+#endgame {
+  top: 5%;
+  display: inline-block;
+  position: absolute;
   width: 46.5vh;
   margin: inherit;
 }
@@ -59,11 +67,13 @@ body {
 }
 
 #canvas-wrapper,
-#hold-wrapper {
+#hold-wrapper,
+#next-wrapper {
   display: inline-block;
 }
 
-#hold {
+#hold,
+#next {
   height: 20vh;
 }
 
@@ -84,7 +94,9 @@ body {
 #lines-cleared,
 #lines,
 #level-label,
-#level {
+#level, 
+#endgame-lines,
+#endgame-points {
   display: inline;
 }
 
@@ -92,6 +104,11 @@ body {
 #lines,
 #level {
   color: yellow;
+}
+
+#next-wrapper {
+  position: absolute;
+  top: 15%;
 }
 
 #press-to-play {

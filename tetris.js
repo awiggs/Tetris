@@ -3,9 +3,12 @@ const canvas = document.getElementById('tetris');
 const context = canvas.getContext('2d');
 const hold_canvas = document.getElementById("hold");
 const hold_context = hold_canvas.getContext("2d");
+const next_canvas = document.getElementById("next");
+const next_context = next_canvas.getContext("2d");
 
 context.scale(20, 20);
 hold_context.scale(40, 40);
+next_context.scale(40, 40);
 
 // Globals
 // TODO add starting levels and adjust speed math
@@ -15,6 +18,7 @@ var level = 0;
 var linesCleared = 0;
 const pieces = 'ILJOTSZ';
 var hold = [];
+var next = [];
 
 // Line clears + score
 function arenaSweep() {
@@ -146,12 +150,17 @@ function draw() {
   hold_context.fillStyle = '#323C4D';
   hold_context.fillRect(0, 0, hold_canvas.width, hold_canvas.height);
 
+  // Draw next
+  next_context.fillStyle = '#323C4D';
+  next_context.fillRect(0, 0, next_canvas.width, next_canvas.height);
+
   // Draw arena
   drawMatrix(arena, {x: 0, y: 0});
 
   // Draw piece
   drawMatrix(player.matrix, player.pos);
-  drawHold(hold, {x: 0, y: 0});
+  drawSmall(hold, hold_context);
+  drawSmall(next, next_context);
 }
 
 function drawCanvas() {
@@ -191,27 +200,25 @@ function drawMatrix(matrix, offset) {
   });
 }
 
-function drawHold(matrix, offset) {
+function drawSmall(matrix, cont) {
   matrix.forEach((row, y) => {
     row.forEach((val, x) => {
       // 0 = nothing, 1 = block
       if (val !== 0) {
         // Color pieces
-        hold_context.fillStyle = colors[val];
-        hold_context.fillRect(x + offset.x,
-                         y + offset.y, 
-                         1, 1);
+        cont.fillStyle = colors[val];
+        cont.fillRect(x, y, 1, 1);
 
         // Draw lines on pieces
-        hold_context.strokeStyle = '#000';
-        hold_context.lineWidth = 0.04;
-        hold_context.strokeRect(x + offset.x, y + offset.y, 1, 1);
+        cont.strokeStyle = '#000';
+        cont.lineWidth = 0.04;
+        cont.strokeRect(x, y, 1, 1);
       } else {
         // Draw lines on arena
         if (matrix === arena) {
-          hold_context.strokeStyle = '#000';
-          hold_context.lineWidth = 0.03
-          hold_context.strokeRect(x, y, 1, 1);
+          cont.strokeStyle = '#000';
+          cont.lineWidth = 0.03
+          cont.strokeRect(x, y, 1, 1);
         }
       }
     });
@@ -255,11 +262,21 @@ function playerDrop() {
   dropCounter = 0;
 }
 
+function setNextPiece() {
+  next = createPiece(pieces[pieces.length * Math.random() | 0]);
+  drawSmall(next, next_context);
+}
+
 function playerReset() {
   // Create a random new piece
-  player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
+  if (next.length === 0) {
+    player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
+  } else {
+    player.matrix = next;
+  }
   player.pos.y = 0;
   player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+  setNextPiece();
 
   // Game over, filled arena
   if (collide(arena, player)) {
@@ -382,6 +399,7 @@ function menu() {
           updateSpeed(level);
 
           // Start game
+          playerReset();
           update();
           break;
         case 3:
@@ -407,19 +425,30 @@ function menu() {
 function restartGame() {
   // Stop flow of game
   isPaused = true;
+  cancelAnimationFrame(updateID);
 
   // Reset canvas
   drawCanvasBlank();
   arena.forEach(row => row.fill(0));
   hold = [];
+  next = [];
 
   // Show menu + reset
   document.querySelector('#menu').classList.remove('hidden');
   document.querySelector('#option-2').focus();
 
-  // Draw hold
+  // Display lines + score
+  document.querySelector('#endgame').classList.remove('hidden');
+  document.querySelector('#endgame-lines').innerText = linesCleared;
+  document.querySelector('#endgame-points').innerText = player.score;
+
+  // Reset hold
   hold_context.fillStyle = '#323C4D';
   hold_context.fillRect(0, 0, hold_canvas.width, hold_canvas.height);
+
+  // Reset next
+  next_context.fillStyle = '#323C4D';
+  next_context.fillRect(0, 0, next_canvas.width, next_canvas.height);
 
   // Reset stats
   linesCleared = 0;
@@ -451,6 +480,7 @@ function rotate(matrix, dir) {
 function startGame() {
   document.querySelector('#level').innerText = 0;
   document.querySelector('#control-options').classList.add('hidden');
+  document.querySelector('#endgame').classList.add('hidden');
 }
 
 // Handle piece dropping
@@ -482,6 +512,7 @@ function pause() {
   isPaused = true;
   document.getElementById('press-to-play').innerText = 'Paused!\nPress any key to continue...';
   document.onkeypress = () => {
+    document.onkeypress = null;
     isPaused = false;
     document.getElementById('press-to-play').innerText = '';
     update();
@@ -571,7 +602,8 @@ document.addEventListener('keydown', event => {
     // Check for first hold
     if (hold.length === 0) {
       hold = player.matrix;
-      player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
+      player.matrix = next;
+      setNextPiece();
       draw();
     } else {
       // Regular hold
@@ -590,7 +622,6 @@ document.addEventListener('keydown', event => {
 });
 
 // Start Tetris
-playerReset();
 updateScore();
 menu();
 startGame();
