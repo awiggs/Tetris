@@ -315,8 +315,11 @@ function menu() {
           break;
         case 3:
           document.activeElement.blur();
-          document.getElementById('option-1').focus();
+          document.getElementById('option-4').focus();
           break;
+        case 4:
+          document.activeElement.blur();
+          document.getElementById('option-1').focus();
         default:
           break;
       }
@@ -325,7 +328,7 @@ function menu() {
       switch(active) {
         case 1:
           document.activeElement.blur();
-          document.getElementById('option-3').focus();
+          document.getElementById('option-4').focus();
           break;
         case 2:
           document.activeElement.blur();
@@ -335,6 +338,9 @@ function menu() {
           document.activeElement.blur();
           document.getElementById('option-2').focus();
           break;
+        case 4:
+          document.activeElement.blur();
+          document.getElementById('option-3').focus();
         default:
           break;
       }
@@ -380,6 +386,19 @@ function menu() {
           break;
         case 3:
           break;
+        case 4:
+          // Show controls
+          document.querySelector('#menu-options').classList.add('hidden');
+          document.querySelector('#control-options').classList.remove('hidden');
+          document.querySelector('#controls-back').focus();
+          break;
+        case 5:
+          // Return to Menu
+          document.querySelector('#menu-options').classList.remove('hidden');
+          document.querySelector('#control-options').classList.add('hidden');
+          document.querySelector('#controls-back').blur();
+          document.querySelector('#option-4').focus();
+          break;
       }
     }
   });
@@ -397,6 +416,10 @@ function restartGame() {
   // Show menu + reset
   document.querySelector('#menu').classList.remove('hidden');
   document.querySelector('#option-2').focus();
+
+  // Draw hold
+  hold_context.fillStyle = '#323C4D';
+  hold_context.fillRect(0, 0, hold_canvas.width, hold_canvas.height);
 
   // Reset stats
   linesCleared = 0;
@@ -426,13 +449,8 @@ function rotate(matrix, dir) {
 }
 
 function startGame() {
-  document.getElementById('level').innerText = 0;
-  document.getElementById('press-to-play').innerText = 'Press any key to continue...';
-  document.onkeypress = () => {
-    document.getElementById('press-to-play').innerText = '';
-    // update();
-    menu();
-  }
+  document.querySelector('#level').innerText = 0;
+  document.querySelector('#control-options').classList.add('hidden');
 }
 
 // Handle piece dropping
@@ -547,8 +565,8 @@ document.addEventListener('keydown', event => {
 
   else if (event.keyCode === 67) {
     // Reset player position to top
-    player.pos.x = 4;
     player.pos.y = 0;
+    player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
 
     // Check for first hold
     if (hold.length === 0) {
@@ -575,4 +593,4 @@ document.addEventListener('keydown', event => {
 playerReset();
 updateScore();
 menu();
-// startGame();
+startGame();
