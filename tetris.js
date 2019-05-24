@@ -392,6 +392,7 @@ function menu() {
           isPaused = false;
           drawCanvas();
           document.querySelector('#menu').classList.add('hidden');
+          document.querySelector('#endgame').classList.add('hidden');
 
           // Reset stats
           level = parseInt(document.querySelector('#start-level').innerHTML);
@@ -407,6 +408,7 @@ function menu() {
         case 4:
           // Show controls
           document.querySelector('#menu-options').classList.add('hidden');
+          document.querySelector('#endgame').classList.add('hidden');
           document.querySelector('#control-options').classList.remove('hidden');
           document.querySelector('#controls-back').focus();
           break;
