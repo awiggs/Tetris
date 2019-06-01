@@ -6,9 +6,14 @@ const hold_context = hold_canvas.getContext("2d");
 const next_canvas = document.getElementById("next");
 const next_context = next_canvas.getContext("2d");
 
-context.scale(20, 20);
 hold_context.scale(40, 40);
 next_context.scale(40, 40);
+
+// TESTING
+var x = document.getElementById('tetris');
+x.height = window.innerHeight;
+x.width = window.innerWidth / 3.42;
+context.scale(49, 48.75);
 
 // Globals
 // TODO add starting levels and adjust speed math
@@ -19,6 +24,8 @@ var linesCleared = 0;
 const pieces = 'ILJOTSZ';
 var hold = [];
 var next = [];
+const PRIMARY_COLOR = '#daedf0';
+// const PRIMARY_COLOR = '#323C4D';
 
 // Line clears + score
 function arenaSweep() {
@@ -42,6 +49,7 @@ function arenaSweep() {
     // Get total number of rows cleared
     rowCount++;
   }
+  clearMessage(rowCount);
 
   if (rowCount > 0) {
     // Keep track of score
@@ -62,6 +70,28 @@ function arenaSweep() {
     }
     rowCount = 0;
   }
+}
+
+let msg = document.querySelector('#msg');
+function clearMessage(message) {
+  // isPaused = true;
+  msg.classList.remove('hidden');
+  if (message === 2) {
+    // Display DOUBLE
+    msg.innerHTML = 'DOUBLE';
+  } else if (message === 3) {
+    // Display TRIPLE
+    msg.innerHTML = 'TRIPLE';
+  } else if (message === 4) {
+    // Display TETRIS
+    msg.innerHTML = 'TETRIS';
+  }
+
+  setTimeout(() => {
+    // isPaused = false;
+    msg.innerHTML = '';
+    msg.classList.add('hidden');
+  }, 1000);
 }
 
 function changeLevel(newLevel) {
@@ -147,11 +177,11 @@ function draw() {
   drawCanvas();
 
   // Draw hold
-  hold_context.fillStyle = '#323C4D';
+  // hold_context.fillStyle = '#202028';
   hold_context.fillRect(0, 0, hold_canvas.width, hold_canvas.height);
 
   // Draw next
-  next_context.fillStyle = '#323C4D';
+  // next_context.fillStyle = '#202028';
   next_context.fillRect(0, 0, next_canvas.width, next_canvas.height);
 
   // Draw arena
@@ -161,19 +191,19 @@ function draw() {
   drawMatrix(player.matrix, player.pos);
   drawSmall(hold, hold_context);
   drawSmall(next, next_context);
-}
+  }
 
-function drawCanvas() {
+  function drawCanvas() {
   context.fillStyle = '#323C4D';
   context.fillRect(0, 0, canvas.width, canvas.height);
-}
+  }
 
-function drawCanvasBlank() {
+  function drawCanvasBlank() {
   context.fillStyle = '#202028';
   context.fillRect(0, 0, canvas.width, canvas.height);
-}
+  }
 
-function drawMatrix(matrix, offset) {
+  function drawMatrix(matrix, offset) {
   matrix.forEach((row, y) => {
     row.forEach((val, x) => {
       // 0 = nothing, 1 = block
@@ -181,8 +211,8 @@ function drawMatrix(matrix, offset) {
         // Color pieces
         context.fillStyle = colors[val];
         context.fillRect(x + offset.x,
-                         y + offset.y, 
-                         1, 1);
+                          y + offset.y, 
+                          1, 1);
 
         // Draw lines on pieces
         context.strokeStyle = '#000';
@@ -483,19 +513,27 @@ function startGame() {
   document.querySelector('#level').innerText = 0;
   document.querySelector('#control-options').classList.add('hidden');
   document.querySelector('#endgame').classList.add('hidden');
-}
 
-// Handle piece dropping
-let dropCounter = 0;
-let dropInterval = 1000;
-let updateID = null;
+    // Draw hold
+    hold_context.fillStyle = '#202028';
+    hold_context.fillRect(0, 0, hold_canvas.width, hold_canvas.height);
+  
+    // Draw next
+    next_context.fillStyle = '#202028';
+    next_context.fillRect(0, 0, next_canvas.width, next_canvas.height);
+  }
 
-// Handle game timing
-let lastTime = 0;
-function update(time = 0) {
+  // Handle piece dropping
+  let dropCounter = 0;
+  let dropInterval = 1000;
+  let updateID = null;
+
+  // Handle game timing
+  let lastTime = 0;
+  function update(time = 0) {
   const deltaTime = time - lastTime;
   lastTime = time;
-  
+
   // Make pieces drop every 1 second
   dropCounter += deltaTime;
   if (dropCounter > dropInterval) {
@@ -579,6 +617,13 @@ document.addEventListener('keydown', event => {
 
   // Space for hard drop
   else if (event.keyCode === 32) {
+    // ! Figure out bounce animation for hard drop
+    // let x = document.querySelector('#tetris');
+    // x.classList.add('bounce');
+    // setTimeout(() => {
+    //   x.classList.remove('bounce');
+    // }, 300);
+
     while (!collide(arena, player)) {
       ++player.pos.y
     }

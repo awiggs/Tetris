@@ -11,11 +11,34 @@ body {
   font-family: monospace;
 }
 
+canvas {
+  image-rendering: -moz-crisp-edges;    /* Firefox */
+  image-rendering: -webkit-crisp-edges; /* Webkit (Safari) */
+  image-rendering: crisp-edges;
+}
+
+/* EXPERIMENT */
+.bounce {
+  align-self: flex-end;
+  animation-duration: 0.3s;
+  animation-iteration-count: infinite;
+  transform-origin: bottom;
+  animation-name: bounce-3;
+  animation-timing-function: ease;
+}
+@keyframes bounce-3 {
+  0%   { transform: translateY(0); }
+  30%  { transform: translateY(-5px); }
+  50%  { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+
 .hidden {
   display: none !important;
 }
 
-#menu {
+#menu,
+#clear-msg {
   top: 20%;
   display: inline-block;
   position: absolute;
@@ -79,7 +102,7 @@ body {
 
 #hold,
 #next {
-  border: solid .2em #fff;
+  /* border: solid .2em #fff; */
 }
 
 #score-wrapper {
